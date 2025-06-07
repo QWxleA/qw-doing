@@ -1,6 +1,6 @@
 {
-  "id": "2do-quick-logger",
-  "name": "2do - Quick Logger",
+  "id": "qw-doing",
+  "name": "2do - What are you doing",
   "version": "1.0.0",
   "minAppVersion": "0.15.0",
   "description": "Quick logging tool for daily notes. Add timestamped entries with a simple modal or command.",

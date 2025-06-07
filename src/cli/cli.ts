@@ -132,13 +132,22 @@ const addLogEntry = async (logMessage: string, customTime?: string, config: Logg
       return;
     }
     
-    const { entryAdded, totalEntries, isNewFile, parsedTime } = result.data;
+    const { entryAdded, totalEntries, isNewFile, parsedTime, targetDate } = result.data;
     
     // Success feedback
     if (isNewFile) {
-      console.log(`📄 Created new daily note`);
+      if (targetDate) {
+        console.log(`📄 Created new daily note: ${targetDate}`);
+      } else {
+        console.log(`📄 Created new daily note`);
+      }
     }
+    
     console.log(`✅ Added log entry: ${entryAdded}`);
+    
+    if (targetDate) {
+      console.log(`📅 Added to: ${targetDate}`);
+    }
     
     if (parsedTime) {
       console.log(`🤖 Parsed natural language time reference to: ${parsedTime}`);
@@ -244,19 +253,23 @@ Examples:
   2do --time 14:15 "Met with Sarah about project timeline"
   2do "had lunch @an hour ago"              # Natural language time parsing
   2do "morning standup @this morning at 9am" # More complex natural language
-  2do "meeting prep @yesterday at 2pm"      # Past date references
+  2do "meeting prep @yesterday at 2pm"      # Past date references (writes to yesterday's file)
+  2do "drank coffee @yesterday"             # Simple past date (writes to yesterday's file)
   2do "code review @14:30"                  # Still supports exact time with @
   2do -l                                    # List today's entries
   2do --list                                # List today's entries  
 
 Natural Language Time Parsing:
   Use @ followed by natural language to specify when something happened:
-  • @an hour ago
-  • @this morning at 9am
-  • @yesterday afternoon
-  • @30 minutes ago
-  • @today at noon
-  • @14:30 (exact time also works with @)
+  • @an hour ago                   (time in today's note)
+  • @this morning at 9am           (time in today's note)
+  • @yesterday afternoon           (writes to yesterday's note)
+  • @yesterday at 2pm              (writes to yesterday's note)
+  • @30 minutes ago                (time in today's note)
+  • @today at noon                 (time in today's note)
+  • @14:30                         (exact time also works with @)
+  
+  Note: Future dates are not allowed and will show an error.
 
 Configuration:
   Journal directory: ${DEFAULT_CONFIG.journalDir}

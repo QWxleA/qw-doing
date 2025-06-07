@@ -1,4 +1,4 @@
-# qw-2do - Quick Logger for Obsidian
+# qw-doing - Quick Logger for Obsidian
 
 A simple, functional logging tool that works both as an Obsidian plugin and a command-line utility. Quickly add timestamped entries to your daily notes with automatic chronological sorting.
 
@@ -17,7 +17,7 @@ A simple, functional logging tool that works both as an Obsidian plugin and a co
 
 1. Copy the built plugin files to your Obsidian vault's plugins folder:
    ```
-   .obsidian/plugins/2do-quick-logger/
+   .obsidian/plugins/qw-doing/
    ```
 
 2. Enable the plugin in Obsidian Settings → Community Plugins
@@ -65,7 +65,7 @@ This creates a symlink at `$HOME/bin/2do` pointing to the built CLI.
 ## Project Structure
 
 ```
-qw-2do/
+qw-doing/
 ├── src/
 │   ├── shared/           # Shared library
 │   │   ├── core.ts      # Core logging functions

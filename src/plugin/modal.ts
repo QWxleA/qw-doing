@@ -29,7 +29,7 @@ export class QuickLogModal extends Modal {
       placeholder: 'What did you do?'
     });
     textInput.style.flex = '1';
-    textInput.style.minWidth = '40ch';
+    textInput.style.minWidth = '60ch';
     textInput.style.padding = '8px';
     textInput.style.border = '1px solid var(--background-modifier-border)';
     textInput.style.borderRadius = '4px';

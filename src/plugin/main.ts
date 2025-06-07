@@ -19,10 +19,10 @@ export default class TwoDoPlugin extends Plugin {
     await this.loadSettings();
 
     // Add ribbon icon
-    const ribbonIconEl = this.addRibbonIcon('calendar-plus', '2do - Quick Log', (evt: MouseEvent) => {
+    const ribbonIconEl = this.addRibbonIcon('calendar-plus', 'qw-doing - Quick Log', (evt: MouseEvent) => {
       this.openQuickLogModal();
     });
-    ribbonIconEl.addClass('2do-ribbon-icon');
+    ribbonIconEl.addClass('qw-doing-ribbon-icon');
 
     // Add command
     this.addCommand({
@@ -42,11 +42,11 @@ export default class TwoDoPlugin extends Plugin {
       }
     });
 
-    console.log('2do plugin loaded');
+    console.log('qw-doing plugin loaded');
   }
 
   onunload() {
-    console.log('2do plugin unloaded');
+    console.log('qw-doing plugin unloaded');
   }
 
   async loadSettings() {

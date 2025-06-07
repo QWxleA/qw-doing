@@ -1,5 +1,5 @@
 {
-  "name": "qw-2do",
+  "name": "qw-doing",
   "version": "1.0.0",
   "description": "Quick logging tool for Obsidian daily notes with CLI companion",
   "main": "dist/plugin/main.js",

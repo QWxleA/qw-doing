@@ -28,19 +28,32 @@ export interface FileOperations {
 
 /**
  * Core function to add a log entry - works with both CLI and plugin
- * Now supports natural language time parsing with @ syntax
+ * Now supports natural language time parsing with @ syntax and cross-date entries
  */
 export const addLogEntryCore = async (
   command: AddEntryCommand,
   config: LoggerConfig,
   fileOps: FileOperations
-): Promise<LoggerResult<{ entryAdded: string; totalEntries: number; isNewFile: boolean; parsedTime?: string }>> => {
+): Promise<LoggerResult<{ entryAdded: string; totalEntries: number; isNewFile: boolean; parsedTime?: string; targetDate?: string }>> => {
   try {
-    const filename = getTodayFilename();
-    const filepath = `${config.journalDir}/${filename}`;
-    
     // Parse the message for natural language time references
     const parsed = parseMessageWithTime(command.message);
+    
+    // Check for future date attempts
+    if (parsed.isFutureDate) {
+      return {
+        success: false,
+        error: createLoggerError(
+          'INVALID_TIME_FORMAT',
+          'Cannot add entries for future dates. Please use past or present dates only.'
+        )
+      };
+    }
+    
+    // Determine target filename: parsed date > today
+    const filename = parsed.targetDate || getTodayFilename();
+    const filepath = `${config.journalDir}/${filename}`;
+    
     let timestamp: string;
     let finalMessage = parsed.message;
     
@@ -71,7 +84,13 @@ export const addLogEntryCore = async (
     if (await fileOps.exists(filepath)) {
       content = await fileOps.read(filepath);
     } else {
-      content = createDailyNoteTemplate();
+      // Create template with appropriate date
+      const dateString = filename.replace('.md', '');
+      content = `# ${dateString}
+
+## Today
+
+`;
       isNewFile = true;
       await fileOps.ensureDir(config.journalDir);
     }
@@ -118,7 +137,8 @@ export const addLogEntryCore = async (
         entryAdded: logEntry,
         totalEntries: allEntries.length,
         isNewFile,
-        parsedTime: parsed.isNaturalLanguage ? parsed.timestamp : undefined
+        parsedTime: parsed.isNaturalLanguage ? parsed.timestamp : undefined,
+        targetDate: parsed.targetDate ? filename : undefined
       }
     };
     
