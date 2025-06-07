@@ -11,7 +11,7 @@ export interface CliConfig extends LoggerConfig {
  * Default configuration with reasonable fallbacks
  */
 const getDefaultConfig = (): CliConfig => ({
-  journalDir: path.join(os.homedir(), 'Documents', 'Journal'),
+  journalDir: path.join(os.homedir(), 'Documents', 'ThirdTime', 'Journal'),
   dateFormat: 'YYYY-MM-DD',
   timeFormat: 'HH:mm',
   todayHeader: '## Today'

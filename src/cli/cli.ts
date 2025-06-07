@@ -3,7 +3,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { addLogEntryCore, listTodayEntriesCore, FileOperations } from '../shared/core';
-import { LoggerConfig, AddEntryCommand } from '../shared/types';
+import { AddEntryCommand } from '../shared/types';
 import { createLoggerError } from '../shared/utils';
 import { loadCliConfig, createSampleConfig, validateConfig, CliConfig } from './config';
 
@@ -153,6 +153,7 @@ const addLogEntry = async (logMessage: string, customTime?: string, config: CliC
  * Parses command line arguments
  */
 const parseArguments = (args: string[]): CommandArgs => {
+  console.log(args);
   const result: CommandArgs = {};
   const messageArgs: string[] = [];
   
@@ -229,6 +230,7 @@ Options:
   -l, --list                 List today's log entries
   -u, --undo                 Remove the last log entry (legacy - not implemented with shared core)
   -h, --help                 Show this help message
+  --init                     Create a sample configuration file
 
 Examples:
   2do "Had a productive morning call"
@@ -240,7 +242,8 @@ Examples:
   2do "drank coffee @yesterday"             # Simple past date (writes to yesterday's file)
   2do "code review @14:30"                  # Still supports exact time with @
   2do -l                                    # List today's entries
-  2do --list                                # List today's entries  
+  2do --list                                # List today's entries
+  2do --init                                # Create sample config file
 
 Natural Language Time Parsing:
   Use @ followed by natural language to specify when something happened:
@@ -255,10 +258,16 @@ Natural Language Time Parsing:
   Note: Future dates are not allowed and will show an error.
 
 Configuration:
-  Journal directory: ${DEFAULT_CONFIG.journalDir}
-  Daily note format: YYYY-MM-DD.md
-  Entry format: - **HH:mm** <message>
-  Target header: ${DEFAULT_CONFIG.todayHeader}
+  Config file locations (in order of preference):
+  • ~/.qw-doing.json
+  • ~/.config/qw-doing.json  
+  • ./.qw-doing.json (current directory)
+  
+  Current settings:
+  Journal directory: ${CONFIG.journalDir}
+  Daily note format: ${CONFIG.dateFormat}.md
+  Entry format: - **${CONFIG.timeFormat}** <message>
+  Target header: ${CONFIG.todayHeader}
 
 Features:
   • Automatic chronological sorting of entries
@@ -267,6 +276,7 @@ Features:
   • Custom timestamp support
   • Integration with Obsidian markdown format
   • Shared codebase with Obsidian plugin
+  • Configurable via JSON config file
 
 The tool will create a new daily note if one doesn't exist for today.
 `);
@@ -278,6 +288,7 @@ The tool will create a new daily note if one doesn't exist for today.
 const main = async (): Promise<void> => {
   try {
     const args = process.argv.slice(2);
+    console.log(args)
     
     // If no arguments, default to list
     if (args.length === 0) {
