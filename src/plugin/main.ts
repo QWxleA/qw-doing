@@ -13,7 +13,7 @@ const DEFAULT_SETTINGS: TwoDoPluginSettings = {
 };
 
 export default class TwoDoPlugin extends Plugin {
-  settings: TwoDoPluginSettings;
+  settings: TwoDoPluginSettings = DEFAULT_SETTINGS;
 
   async onload() {
     await this.loadSettings();
