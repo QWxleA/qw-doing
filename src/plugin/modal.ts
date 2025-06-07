@@ -16,47 +16,43 @@ export class QuickLogModal extends Modal {
     const { contentEl } = this;
     contentEl.empty();
     
-    contentEl.createEl('h2', { text: '2do - Quick Log Entry' });
+    // Create horizontal container
+    const container = contentEl.createDiv();
+    container.style.display = 'flex';
+    container.style.alignItems = 'center';
+    container.style.gap = '10px';
+    container.style.padding = '10px';
     
-    // Message input
-    new Setting(contentEl)
-      .setName('Log Message')
-      .setDesc('Enter your log entry')
-      .addText(text => {
-        text
-          .setPlaceholder('What did you do?')
-          .setValue(this.message)
-          .onChange(value => {
-            this.message = value;
-          });
-        
-        // Focus the input field
-        text.inputEl.focus();
-        
-        // Handle enter key
-        text.inputEl.addEventListener('keydown', (evt) => {
-          if (evt.key === 'Enter' && !evt.shiftKey) {
-            evt.preventDefault();
-            this.submitEntry();
-          }
-        });
-      });
+    // Text input
+    const textInput = container.createEl('input', {
+      type: 'text',
+      placeholder: 'What did you do?'
+    });
+    textInput.style.flex = '1';
+    textInput.style.minWidth = '40ch';
+    textInput.style.padding = '8px';
+    textInput.style.border = '1px solid var(--background-modifier-border)';
+    textInput.style.borderRadius = '4px';
+    textInput.value = this.message;
     
-    // Buttons
-    const buttonContainer = contentEl.createDiv({ cls: 'modal-button-container' });
-    buttonContainer.style.display = 'flex';
-    buttonContainer.style.justifyContent = 'flex-end';
-    buttonContainer.style.gap = '10px';
-    buttonContainer.style.marginTop = '20px';
+    // Focus the input field
+    textInput.focus();
     
-    // Cancel button
-    const cancelBtn = buttonContainer.createEl('button', { text: 'Cancel' });
-    cancelBtn.addEventListener('click', () => {
-      this.close();
+    // Handle input changes
+    textInput.addEventListener('input', (evt) => {
+      this.message = (evt.target as HTMLInputElement).value;
+    });
+    
+    // Handle enter key
+    textInput.addEventListener('keydown', (evt) => {
+      if (evt.key === 'Enter') {
+        evt.preventDefault();
+        this.submitEntry();
+      }
     });
     
     // Add button
-    const addBtn = buttonContainer.createEl('button', { 
+    const addBtn = container.createEl('button', { 
       text: 'Add Entry',
       cls: 'mod-cta'
     });
