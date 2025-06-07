@@ -34,7 +34,9 @@
     "tslib": "2.6.2",
     "typescript": "^5.0.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "chrono-node": "^2.6.1"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/qwxlea/qw-2do"

@@ -59,7 +59,7 @@ export default class TwoDoPlugin extends Plugin {
 
   private openQuickLogModal() {
     const config: PluginConfig = {
-      vaultPath: this.app.vault.adapter.basePath || '',
+      vaultPath: '',
       journalDir: this.settings.journalDir,
       todayHeader: this.settings.todayHeader,
       dateFormat: 'YYYY-MM-DD',

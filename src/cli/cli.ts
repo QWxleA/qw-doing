@@ -132,7 +132,7 @@ const addLogEntry = async (logMessage: string, customTime?: string, config: Logg
       return;
     }
     
-    const { entryAdded, totalEntries, isNewFile } = result.data;
+    const { entryAdded, totalEntries, isNewFile, parsedTime } = result.data;
     
     // Success feedback
     if (isNewFile) {
@@ -140,7 +140,9 @@ const addLogEntry = async (logMessage: string, customTime?: string, config: Logg
     }
     console.log(`✅ Added log entry: ${entryAdded}`);
     
-    if (customTime) {
+    if (parsedTime) {
+      console.log(`🤖 Parsed natural language time reference to: ${parsedTime}`);
+    } else if (customTime) {
       console.log(`🕐 Used custom timestamp: ${customTime}`);
     }
     
@@ -240,8 +242,21 @@ Examples:
   2do "Had a productive morning call"
   2do -t 09:30 "Retrospective meeting notes"
   2do --time 14:15 "Met with Sarah about project timeline"
-  2do -l                    # List today's entries
-  2do --list                # List today's entries  
+  2do "had lunch @an hour ago"              # Natural language time parsing
+  2do "morning standup @this morning at 9am" # More complex natural language
+  2do "meeting prep @yesterday at 2pm"      # Past date references
+  2do "code review @14:30"                  # Still supports exact time with @
+  2do -l                                    # List today's entries
+  2do --list                                # List today's entries  
+
+Natural Language Time Parsing:
+  Use @ followed by natural language to specify when something happened:
+  • @an hour ago
+  • @this morning at 9am
+  • @yesterday afternoon
+  • @30 minutes ago
+  • @today at noon
+  • @14:30 (exact time also works with @)
 
 Configuration:
   Journal directory: ${DEFAULT_CONFIG.journalDir}
@@ -252,6 +267,7 @@ Configuration:
 Features:
   • Automatic chronological sorting of entries
   • Smart daily note creation
+  • Natural language time parsing with @ syntax
   • Custom timestamp support
   • Integration with Obsidian markdown format
   • Shared codebase with Obsidian plugin

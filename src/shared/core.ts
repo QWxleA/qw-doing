@@ -16,6 +16,7 @@ import {
   parseLogEntry,
   compareTimeStrings
 } from './utils';
+import { parseMessageWithTime } from './timeParser';
 
 // Abstract file operations interface - to be implemented by CLI and plugin
 export interface FileOperations {
@@ -27,18 +28,23 @@ export interface FileOperations {
 
 /**
  * Core function to add a log entry - works with both CLI and plugin
+ * Now supports natural language time parsing with @ syntax
  */
 export const addLogEntryCore = async (
   command: AddEntryCommand,
   config: LoggerConfig,
   fileOps: FileOperations
-): Promise<LoggerResult<{ entryAdded: string; totalEntries: number; isNewFile: boolean }>> => {
+): Promise<LoggerResult<{ entryAdded: string; totalEntries: number; isNewFile: boolean; parsedTime?: string }>> => {
   try {
     const filename = getTodayFilename();
     const filepath = `${config.journalDir}/${filename}`;
     
-    // Validate custom time if provided
+    // Parse the message for natural language time references
+    const parsed = parseMessageWithTime(command.message);
     let timestamp: string;
+    let finalMessage = parsed.message;
+    
+    // Determine timestamp priority: customTime > parsed @ time > current time
     if (command.customTime) {
       if (!validateTimeFormat(command.customTime)) {
         return {
@@ -50,11 +56,13 @@ export const addLogEntryCore = async (
         };
       }
       timestamp = formatTime(command.customTime);
+    } else if (parsed.timestamp) {
+      timestamp = parsed.timestamp;
     } else {
       timestamp = getCurrentTime();
     }
     
-    const logEntry = `- **${timestamp}** ${command.message}`;
+    const logEntry = `- **${timestamp}** ${finalMessage}`;
     
     let content: string;
     let isNewFile = false;
@@ -75,7 +83,7 @@ export const addLogEntryCore = async (
     // Create new entry object
     const newEntry: LogEntry = {
       time: timestamp,
-      message: command.message,
+      message: finalMessage,
       raw: logEntry
     };
     
@@ -109,7 +117,8 @@ export const addLogEntryCore = async (
       data: {
         entryAdded: logEntry,
         totalEntries: allEntries.length,
-        isNewFile
+        isNewFile,
+        parsedTime: parsed.isNaturalLanguage ? parsed.timestamp : undefined
       }
     };
     
