@@ -15,7 +15,20 @@ interface CommandArgs {
   undo?: boolean;
   help?: boolean;
   init?: boolean;
+  verbose?: number; // 0 = quiet, 1 = -v, 2 = -vv
 }
+
+// Global verbose level
+let VERBOSE_LEVEL = 0;
+
+// Verbose logging functions
+export const vlog = (message: string) => {
+  if (VERBOSE_LEVEL >= 1) console.log(message);
+};
+
+const vvlog = (message: string) => {
+  if (VERBOSE_LEVEL >= 2) console.log(message);
+};
 
 // Load configuration
 const CONFIG = loadCliConfig();
@@ -63,7 +76,7 @@ const listTodayEntries = async (config: CliConfig = CONFIG): Promise<void> => {
     
     if (entries.length === 0) {
       console.log(`📋 No log entries found for today in ${filename}`);
-      console.log(`💡 Add your first entry with: 2do "Your message here"`);
+      vlog(`💡 Add your first entry with: 2do "Your message here"`);
       return;
     }
     
@@ -73,7 +86,7 @@ const listTodayEntries = async (config: CliConfig = CONFIG): Promise<void> => {
       console.log(`  ${entry.raw}`);
     });
     console.log('');
-    console.log(`📊 Total entries: ${entries.length}`);
+    vlog(`📊 Total entries: ${entries.length}`);
     
   } catch (error: any) {
     if (error && error.type) {
@@ -116,25 +129,25 @@ const addLogEntry = async (logMessage: string, customTime?: string, config: CliC
     // Success feedback
     if (isNewFile) {
       if (targetDate) {
-        console.log(`📄 Created new daily note: ${targetDate}`);
+        vlog(`📄 Created new daily note: ${targetDate}`);
       } else {
-        console.log(`📄 Created new daily note`);
+        vlog(`📄 Created new daily note`);
       }
     }
     
-    console.log(`✅ Added log entry: ${entryAdded}`);
+    vlog(`✅ Added log entry: ${entryAdded}`);
     
     if (targetDate) {
-      console.log(`📅 Added to: ${targetDate}`);
+      vlog(`📅 Added to: ${targetDate}`);
     }
     
     if (parsedTime) {
-      console.log(`🤖 Parsed natural language time reference to: ${parsedTime}`);
+      vlog(`🤖 Parsed natural language time reference to: ${parsedTime}`);
     } else if (customTime) {
-      console.log(`🕐 Used custom timestamp: ${customTime}`);
+      vlog(`🕐 Used custom timestamp: ${customTime}`);
     }
     
-    console.log(`📊 Total entries: ${totalEntries}`);
+    vlog(`📊 Total entries: ${totalEntries}`);
     
   } catch (error: any) {
     if (error && error.type) {
@@ -153,7 +166,6 @@ const addLogEntry = async (logMessage: string, customTime?: string, config: CliC
  * Parses command line arguments
  */
 const parseArguments = (args: string[]): CommandArgs => {
-  console.log(args);
   const result: CommandArgs = {};
   const messageArgs: string[] = [];
   
@@ -164,6 +176,14 @@ const parseArguments = (args: string[]): CommandArgs => {
       case '-h':
       case '--help':
         result.help = true;
+        break;
+        
+      case '-v':
+        result.verbose = (result.verbose || 0) + 1;
+        break;
+        
+      case '-vv':
+        result.verbose = 2;
         break;
         
       case '--init':
@@ -230,6 +250,8 @@ Options:
   -l, --list                 List today's log entries
   -u, --undo                 Remove the last log entry (legacy - not implemented with shared core)
   -h, --help                 Show this help message
+  -v                         Verbose output (show additional info)
+  -vv                        Extra verbose output (show debug info)
   --init                     Create a sample configuration file
 
 Examples:
@@ -288,15 +310,22 @@ The tool will create a new daily note if one doesn't exist for today.
 const main = async (): Promise<void> => {
   try {
     const args = process.argv.slice(2);
-    console.log(args)
+    
+    // Parse arguments first to get verbose level
+    const parsed = parseArguments(args);
+    
+    // Set global verbose level
+    VERBOSE_LEVEL = parsed.verbose || 0;
+    
+    // Debug output for -vv
+    vvlog(`📋 Arguments received: ${JSON.stringify(args)}`);
+    vvlog(`📋 Parsed arguments: ${JSON.stringify(parsed)}`);
     
     // If no arguments, default to list
     if (args.length === 0) {
       await listTodayEntries();
       return;
     }
-    
-    const parsed = parseArguments(args);
     
     // Handle help
     if (parsed.help) {
@@ -319,12 +348,13 @@ const main = async (): Promise<void> => {
     // Handle undo (legacy - would need to be implemented with shared core)
     if (parsed.undo) {
       console.log('❌ Undo functionality not yet implemented with shared core');
-      console.log('💡 Use the list command to see entries, then manually edit the file');
+      vlog('💡 Use the list command to see entries, then manually edit the file');
       return;
     }
     
     // Handle adding entry
     if (parsed.message) {
+      vvlog(`📝 Adding entry: "${parsed.message}" with time: ${parsed.time || 'auto'}`);
       await addLogEntry(parsed.message, parsed.time);
     } else if (parsed.time) {
       // If time is specified but no message, that's an error

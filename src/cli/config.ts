@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { LoggerConfig } from '../shared/types';
+import { vlog } from './cli'
 
 export interface CliConfig extends LoggerConfig {
   // CLI-specific config can be added here
@@ -55,8 +56,8 @@ export const loadCliConfig = (): CliConfig => {
   }
   
   // No config file found, use defaults
-  console.log(`📄 Using default configuration (no config file found)`);
-  console.log(`💡 Create ${configPaths[0]} to customize settings`);
+  vlog(`📄 Using default configuration (no config file found)`);
+  vlog(`💡 Create ${configPaths[0]} to customize settings`);
   
   return defaultConfig;
 };
