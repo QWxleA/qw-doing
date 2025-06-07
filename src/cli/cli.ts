@@ -3,8 +3,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { addLogEntryCore, listTodayEntriesCore, FileOperations } from '../shared/core';
-import { LoggerConfig, AddEntryCommand, LoggerErrorType } from '../shared/types';
+import { LoggerConfig, AddEntryCommand } from '../shared/types';
 import { createLoggerError } from '../shared/utils';
+import { loadCliConfig, createSampleConfig, validateConfig, CliConfig } from './config';
 
 // CLI-specific argument interface
 interface CommandArgs {
@@ -13,15 +14,11 @@ interface CommandArgs {
   list?: boolean;
   undo?: boolean;
   help?: boolean;
+  init?: boolean;
 }
 
-// Default configuration for CLI
-const DEFAULT_CONFIG: LoggerConfig = {
-  journalDir: process.env.HOME + '/Documents/ThirdTime/Journal',
-  dateFormat: 'YYYY-MM-DD',
-  timeFormat: 'HH:mm',
-  todayHeader: '## Today'
-};
+// Load configuration
+const CONFIG = loadCliConfig();
 
 // File operations implementation for Node.js
 const createNodeFileOperations = (): FileOperations => ({
@@ -45,33 +42,13 @@ const createNodeFileOperations = (): FileOperations => ({
 });
 
 /**
- * Validates that the journal directory exists and is accessible
- */
-const validateJournalDirectory = (journalDir: string): void => {
-  if (!fs.existsSync(journalDir)) {
-    throw createLoggerError(
-      'DIRECTORY_NOT_FOUND',
-      `Journal directory does not exist: ${journalDir}\nPlease create the directory or update the JOURNAL_DIR path in the script.`
-    );
-  }
-  
-  // Check if directory is writable
-  try {
-    fs.accessSync(journalDir, fs.constants.W_OK);
-  } catch (error) {
-    throw createLoggerError(
-      'DIRECTORY_NOT_FOUND',
-      `Journal directory is not writable: ${journalDir}`
-    );
-  }
-};
-
-/**
  * Lists today's log entries using the shared core function
  */
-const listTodayEntries = async (config: LoggerConfig = DEFAULT_CONFIG): Promise<void> => {
+const listTodayEntries = async (config: CliConfig = CONFIG): Promise<void> => {
   try {
-    validateJournalDirectory(config.journalDir);
+    if (!validateConfig(config)) {
+      process.exit(1);
+    }
     
     const fileOps = createNodeFileOperations();
     const result = await listTodayEntriesCore(config, fileOps);
@@ -111,9 +88,11 @@ const listTodayEntries = async (config: LoggerConfig = DEFAULT_CONFIG): Promise<
 /**
  * Adds a log entry using the shared core function
  */
-const addLogEntry = async (logMessage: string, customTime?: string, config: LoggerConfig = DEFAULT_CONFIG): Promise<void> => {
+const addLogEntry = async (logMessage: string, customTime?: string, config: CliConfig = CONFIG): Promise<void> => {
   try {
-    validateJournalDirectory(config.journalDir);
+    if (!validateConfig(config)) {
+      process.exit(1);
+    }
     
     const command: AddEntryCommand = {
       message: logMessage,
@@ -184,6 +163,10 @@ const parseArguments = (args: string[]): CommandArgs => {
       case '-h':
       case '--help':
         result.help = true;
+        break;
+        
+      case '--init':
+        result.init = true;
         break;
         
       case '-l':
@@ -307,6 +290,12 @@ const main = async (): Promise<void> => {
     // Handle help
     if (parsed.help) {
       displayHelp();
+      return;
+    }
+    
+    // Handle init (create config file)
+    if (parsed.init) {
+      createSampleConfig();
       return;
     }
     

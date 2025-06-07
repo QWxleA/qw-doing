@@ -1,22 +1,16 @@
 import { Plugin, Notice } from 'obsidian';
 import { QuickLogModal } from './modal';
 import { PluginConfig } from '../shared/types';
+import { QwDoingSettingTab, QwDoingSettings, DEFAULT_SETTINGS } from './settings';
 
-interface TwoDoPluginSettings {
-  journalDir: string;
-  todayHeader: string;
-}
-
-const DEFAULT_SETTINGS: TwoDoPluginSettings = {
-  journalDir: 'Journal',
-  todayHeader: '## Today'
-};
-
-export default class TwoDoPlugin extends Plugin {
-  settings: TwoDoPluginSettings = DEFAULT_SETTINGS;
+export default class QwDoingPlugin extends Plugin {
+  settings: QwDoingSettings = DEFAULT_SETTINGS;
 
   async onload() {
     await this.loadSettings();
+
+    // Add settings tab
+    this.addSettingTab(new QwDoingSettingTab(this.app, this));
 
     // Add ribbon icon
     const ribbonIconEl = this.addRibbonIcon('calendar-plus', 'qw-doing - Quick Log', (evt: MouseEvent) => {
@@ -62,8 +56,8 @@ export default class TwoDoPlugin extends Plugin {
       vaultPath: '',
       journalDir: this.settings.journalDir,
       todayHeader: this.settings.todayHeader,
-      dateFormat: 'YYYY-MM-DD',
-      timeFormat: 'HH:mm'
+      dateFormat: this.settings.dateFormat,
+      timeFormat: this.settings.timeFormat
     };
 
     new QuickLogModal(this.app, config).open();
