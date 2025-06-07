@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES6",
+    "outDir": "dist",
+    "declaration": false,
+    "lib": ["DOM", "ES6"]
+  },
+  "include": [
+    "src/shared/**/*",
+    "src/plugin/**/*"
+  ],
+  "exclude": [
+    "src/cli/**/*",
+    "node_modules",
+    "dist"
+  ]
+}

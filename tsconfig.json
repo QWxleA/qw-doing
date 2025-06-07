@@ -9,16 +9,25 @@
     "noImplicitAny": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "isolatedModules": true,
-    "strictNullChecks": true,
+    "declaration": true,
+    "outDir": "dist",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
     "lib": [
       "DOM",
-      "ES5",
-      "ES6",
-      "ES7"
-    ]
+      "ES6"
+    ],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "**/*.ts"
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
   ]
 }

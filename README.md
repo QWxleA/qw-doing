@@ -1,94 +1,190 @@
-# Obsidian Sample Plugin
+# qw-2do - Quick Logger for Obsidian
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+A simple, functional logging tool that works both as an Obsidian plugin and a command-line utility. Quickly add timestamped entries to your daily notes with automatic chronological sorting.
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+## Features
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+- **Dual Interface**: Works as both an Obsidian plugin and CLI tool
+- **Shared Codebase**: Core functionality shared between both implementations
+- **Automatic Timestamps**: Entries are automatically timestamped and sorted chronologically
+- **Simple Modal**: Clean, focused interface for quick logging
+- **Daily Note Integration**: Works with standard Obsidian daily note format
+- **Functional Code Style**: Clean, functional TypeScript implementation
 
-## First time developing plugins?
+## Installation
 
-Quick starting guide for new plugin devs:
+### Plugin Installation
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+1. Copy the built plugin files to your Obsidian vault's plugins folder:
+   ```
+   .obsidian/plugins/2do-quick-logger/
+   ```
 
-## Releasing new releases
+2. Enable the plugin in Obsidian Settings → Community Plugins
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+### CLI Installation
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+1. Build the CLI:
+   ```bash
+   npm run build-cli
+   ```
 
-## Adding your plugin to the community plugin list
+2. Link the CLI tool:
+   ```bash
+   npm run link-cli
+   ```
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+This creates a symlink at `$HOME/bin/2do` pointing to the built CLI.
 
-## How to use
+## Usage
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+### Obsidian Plugin
 
-## Manually installing the plugin
+- **Ribbon Icon**: Click the calendar-plus icon in the left ribbon
+- **Command Palette**: Search for "2do" or "Add quick log entry"
+- **Hotkey**: Set a custom hotkey in Settings → Hotkeys
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+### CLI Usage
 
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
+```bash
+# Add a quick entry
+2do "Had a productive meeting with the team"
 
-## Funding URL
+# Add an entry with custom timestamp
+2do -t 09:30 "Morning standup completed"
 
-You can include funding URLs where people who use your plugin can financially support it.
+# List today's entries
+2do -l
+2do --list
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+# Show help
+2do -h
+2do --help
+```
 
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
+## Project Structure
+
+```
+qw-2do/
+├── src/
+│   ├── shared/           # Shared library
+│   │   ├── core.ts      # Core logging functions
+│   │   ├── types.ts     # Type definitions
+│   │   └── utils.ts     # Utility functions
+│   ├── cli/             # CLI implementation
+│   │   └── cli.ts       # CLI entry point
+│   ├── plugin/          # Obsidian plugin
+│   │   ├── main.ts      # Plugin main file
+│   │   ├── modal.ts     # Modal component
+│   │   └── fileops.ts   # Obsidian file operations
+│   └── manifest.json    # Plugin manifest
+├── dist/                # Built files
+├── package.json
+├── tsconfig.json        # Base TypeScript config
+├── tsconfig.cli.json    # CLI-specific config
+├── tsconfig.plugin.json # Plugin-specific config
+└── esbuild.config.mjs   # Plugin build config
+```
+
+## Configuration
+
+### Plugin Settings
+
+- **Journal Directory**: Relative path to your journal folder (default: "Journal")
+- **Today Header**: Header text to look for (default: "## Today")
+
+### CLI Configuration
+
+Edit the `DEFAULT_CONFIG` in `src/cli/cli.ts`:
+
+```typescript
+const DEFAULT_CONFIG: LoggerConfig = {
+  journalDir: process.env.HOME + '/Documents/ThirdTime/Journal',
+  todayHeader: '## Today'
+};
+```
+
+## Daily Note Format
+
+The tool expects daily notes with this structure:
+
+```markdown
+# 2024-01-15
+
+## Today
+
+- **09:30** Morning standup completed
+- **11:45** Had a productive meeting with the team
+- **14:20** Code review session
+
+## Other sections...
+```
+
+## Development
+
+### Building
+
+```bash
+# Build everything
+npm run build
+
+# Build CLI only
+npm run build-cli
+
+# Build plugin only (for development)
+npm run dev
+
+# Build plugin for production
+npm run build
+```
+
+### Architecture
+
+The project uses a functional approach with:
+
+- **Shared Core**: Pure functions for logging operations
+- **File Operations Interface**: Abstraction layer for different file systems
+- **Type Safety**: Comprehensive TypeScript types
+- **Error Handling**: Result types for better error management
+
+### Key Functions
+
+#### Core Functions (`src/shared/core.ts`)
+
+- `addLogEntryCore()`: Adds a timestamped entry to today's note
+- `listTodayEntriesCore()`: Retrieves all entries from today's note
+
+#### Utility Functions (`src/shared/utils.ts`)
+
+- `getTodayFilename()`: Generates today's filename (YYYY-MM-DD.md)
+- `getCurrentTime()`: Gets current time in HH:mm format
+- `parseLogEntry()`: Parses log entry lines
+- `compareTimeStrings()`: Sorts entries chronologically
+
+## File Operations
+
+The project abstracts file operations through the `FileOperations` interface:
+
+```typescript
+interface FileOperations {
+  exists(path: string): Promise<boolean>;
+  read(path: string): Promise<string>;
+  write(path: string, content: string): Promise<void>;
+  ensureDir(path: string): Promise<void>;
 }
 ```
 
-If you have multiple URLs, you can also do:
+- **CLI**: Uses Node.js `fs` module
+- **Plugin**: Uses Obsidian's Vault API
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
+## Contributing
 
-## API Documentation
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes following the functional style
+4. Add tests for new functionality
+5. Submit a pull request
 
-See https://github.com/obsidianmd/obsidian-api
+## License
+
+MIT License - see LICENSE file for details.

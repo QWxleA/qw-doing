@@ -1,10 +1,11 @@
 {
-	"id": "wip-plugin",
-	"name": "WIP qwxlea plugin",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Development plugin to test new code",
-	"author": "Alex Poslavsky",
-	"authorUrl": "https://qwxlea.org",
-	"isDesktopOnly": false
+  "id": "2do-quick-logger",
+  "name": "2do - Quick Logger",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Quick logging tool for daily notes. Add timestamped entries with a simple modal or command.",
+  "author": "Alex Poslavsky",
+  "authorUrl": "https://github.com/qwxlea",
+  "fundingUrl": "https://github.com/qwxlea/qw-2do",
+  "isDesktopOnly": false
 }
